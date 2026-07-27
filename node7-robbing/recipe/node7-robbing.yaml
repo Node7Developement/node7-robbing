@@ -1,0 +1,15 @@
+$engine: 3
+$onesync: on
+name: NODE7 Robbing
+author: NODE7 Development Studios
+description: Secure radial-menu player robbery using NODE7 Core and NODE7 Inventory.
+tasks:
+  - action: download_github
+    src: REPLACE_WITH_YOUR_NODE7_REPOSITORY
+    ref: main
+    subpath: node7-robbing
+    dest: ./resources/[node7]/node7-robbing
+  - action: append_file
+    file: ./server.cfg
+    data: |
+      ensure node7-robbing
