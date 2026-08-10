@@ -78,9 +78,27 @@ local function isPedHogtiedSafe(ped)
     return ok and truthy(result)
 end
 
+local function isPedHandsUp(ped)
+    if ped == 0 or not DoesEntityExist(ped) then return false end
+
+    local dict = tostring(Config.Robbable.HandsUpAnimDict or '')
+    local anim = tostring(Config.Robbable.HandsUpAnim or '')
+    if dict == '' or anim == '' then return false end
+
+    return IsEntityPlayingAnim(ped, dict, anim, 25) == true
+end
+
 local function calculateRobbableState()
     local ped = PlayerPedId()
     if ped == 0 or not DoesEntityExist(ped) then return false, nil end
+
+    if isPedHandsUp(ped) then
+        return true, 'handsup'
+    end
+
+    if Config.Robbable.RequireHandsUp then
+        return false, nil
+    end
 
     if Config.Robbable.AllowDead and IsEntityDead(ped) then
         return true, 'dead'
@@ -194,6 +212,12 @@ RegisterNetEvent('node7-robbing:client:attemptRob', function()
     local targetPlayer, distance = getClosestPlayer(Config.MaxDistance)
     if not targetPlayer then
         notify('No player is close enough to rob.', 'error')
+        return
+    end
+
+    local targetPed = GetPlayerPed(targetPlayer)
+    if Config.Robbable.RequireHandsUp and not isPedHandsUp(targetPed) then
+        notify('The target player must have their hands up.', 'error')
         return
     end
 

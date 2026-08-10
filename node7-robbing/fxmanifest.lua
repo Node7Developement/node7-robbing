@@ -6,8 +6,8 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 lua54 'yes'
 
 author 'NODE7 Development Studios'
-description 'Secure player robbery integration for NODE7 Core, NODE7 Inventory, and NODE7 Radial Menu.'
-version '1.1.1'
+description 'Secure NODE7 player robbery integration requiring the target to have their hands up.'
+version '1.2.0'
 
 shared_scripts {
     'config.lua'

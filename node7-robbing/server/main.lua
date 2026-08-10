@@ -58,6 +58,27 @@ end
 local function isTargetRobbable(targetId, target)
     if not Config.Robbable.RequireTargetState then return true, 'not-required' end
 
+    local state = getStateBag(targetId)
+    if state and truthy(state[Config.Robbable.StateKey]) then
+        local reason = tostring(state[Config.Robbable.ReasonStateKey] or 'statebag')
+        if not Config.Robbable.RequireHandsUp or reason == 'handsup' then
+            return true, reason
+        end
+    end
+
+    local report = reportedStates[targetId]
+    local now = GetGameTimer()
+    if report and report.robbable and now - report.updatedAt <= (tonumber(Config.Robbable.ReportTimeoutMs) or 7000) then
+        local reason = report.reason or 'client-report'
+        if not Config.Robbable.RequireHandsUp or reason == 'handsup' then
+            return true, reason
+        end
+    end
+
+    if Config.Robbable.RequireHandsUp then
+        return false, nil
+    end
+
     local metadata = target.PlayerData.metadata or {}
     if Config.Robbable.AllowCoreMetadata and metadataHasAny(metadata, Config.Robbable.MetadataKeys) then
         return true, 'metadata'
@@ -69,17 +90,6 @@ local function isTargetRobbable(targetId, target)
             local ok, dead = pcall(IsEntityDead, ped)
             if ok and dead then return true, 'dead' end
         end
-    end
-
-    local state = getStateBag(targetId)
-    if state and truthy(state[Config.Robbable.StateKey]) then
-        return true, tostring(state[Config.Robbable.ReasonStateKey] or 'statebag')
-    end
-
-    local report = reportedStates[targetId]
-    local now = GetGameTimer()
-    if report and report.robbable and now - report.updatedAt <= (tonumber(Config.Robbable.ReportTimeoutMs) or 7000) then
-        return true, report.reason or 'client-report'
     end
 
     return false, nil
@@ -122,7 +132,7 @@ local function validateRobbery(source, targetId)
 
     local robbable, reason = isTargetRobbable(targetId, target)
     if not robbable then
-        return false, 'The target must be dead, incapacitated, restrained, or hogtied.'
+        return false, Config.Robbable.RequireHandsUp and 'The target player must have their hands up.' or 'The target must be dead, incapacitated, restrained, or hogtied.'
     end
 
     return true, nil, player, target, distance, reason or 'unknown'

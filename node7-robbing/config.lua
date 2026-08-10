@@ -17,6 +17,9 @@ Config.Radial = {
 
 Config.Robbable = {
     RequireTargetState = true,
+    RequireHandsUp = true,
+    HandsUpAnimDict = 'script_proc@robberies@homestead@lonnies_shack@deception',
+    HandsUpAnim = 'hands_up_loop',
     AllowDead = true,
     AllowHogtied = true,
     AllowCoreMetadata = true,

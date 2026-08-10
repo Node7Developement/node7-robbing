@@ -68,3 +68,8 @@ exports['node7-robbing']:SetRobbable(true, 'restrained', 10000)
 ```lua
 local allowed, reason = exports['node7-robbing']:CanRobPlayer(source, targetId)
 ```
+
+
+## Hands-up requirement
+
+Player robbery now requires the target to be actively playing the RedM `hands_up_loop` animation used by `node7-handsup`. A robbery attempt is denied unless the target is actively holding their hands up at the time of the attempt.
